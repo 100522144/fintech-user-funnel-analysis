@@ -1,5 +1,6 @@
 import pandas as pd
 import random
+from datetime import datetime, timedelta
 
 #Posibles paises del usuario
 countries = [
@@ -53,7 +54,11 @@ def generate_user(user_id):
         age = random.randint(25,65)
         income_level = random.randint(1000,10000)
     channel = random.choice(channels)
-
+    registration_date = datetime(
+        2025, 
+        random.randint(1,12),
+        random.randint(1,28)
+    )
     return {
         "user_id": user_id,
         "age": age,
@@ -61,52 +66,69 @@ def generate_user(user_id):
         "device": device, 
         "occupation": occupation, 
         "acquisition_channel": channel,
-        "income_level": income_level
+        "income_level": income_level,
+        "registration_date": registration_date
     }
 
 
-def generate_events(user_id):
+def generate_events(user_id, registration_date):
     #Funcion que va a genear los eventos de un usuario
     events = []
 
     #Todos los usuarios hacen signup
     events.append({"user_id": user_id,
-                   "event": "sign_up"})
+                   "event": "sign_up",
+                   "timestamp": registration_date})
     
     #Aprox el 80% van a completar el kyc
     if random.random() < 0.8:
+        #Fecha para el kyc
+        kyc_date = registration_date + timedelta(days=random.randint(0,2))
+
         events.append({"user_id": user_id, 
-                       "event": "kyc_completed"})
+                       "event": "kyc_completed",
+                       "timestamp": kyc_date
+                       })
     
         #Aprox el 75% va a hacer un deposito luego de completar el kyc
         if random.random() < 0.75:
+            #Fecha del deposito
+            deposit_date = kyc_date + timedelta(days = random.randint(1,7))
             events.append({
                 "user_id": user_id,
-                "event": "first_deposit"
+                "event": "first_deposit",
+                "timestamp": deposit_date
             })
         
             #El 85% de esos usuarios acabara pidiendo una tarjeta
             if random.random() < 0.85:
-
+                #Feecha para tarjeta
+                card_date = deposit_date + timedelta(days = random.randint(1,5))
                 events.append({
                     "user_id": user_id,
-                    "event": "card_ordered"
+                    "event": "card_ordered",
+                    "timestamp": card_date
                 })
 
                 #Despues el 80% hara un pago 
                 if random.random() < 0.8:
+                    #Fecha del primer pago
+                    payment_date = card_date + timedelta(days = random.randint(1,15))
 
                     events.append({
                         "user_id": user_id,
-                        "event": "first_payment"
+                        "event": "first_payment",
+                        "timestamp": payment_date
                     })
 
                     #El 35% hará una inversión
                     if random.random() < 0.35:
-
+                        #Fecha primera inversión
+                        investment_date = payment_date + timedelta(days = random.randint(5,90))
                         events.append({
                             "user_id": user_id,
-                            "event": "investment_started"
+                            "event": "investment_started",
+                            "timestamp": investment_date
                         })
 
     
@@ -121,8 +143,8 @@ for i in range(1,101):
 
 #Crear eventos
 all_events = []
-for i in range(1,101):
-    user_events = generate_events(i)
+for user in users:
+    user_events = generate_events(user["user_id"], user["registration_date"])
     all_events.extend(user_events)
 
 #Crear dataframes
