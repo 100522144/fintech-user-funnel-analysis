@@ -140,6 +140,17 @@ def generate_events(user):
                         "event": "first_payment",
                         "timestamp": payment_date
                     })
+                
+                    #Generar sesiones del uso de la app 
+                    number_of_sessions = random.randint(1,20)
+
+                    for _ in range(number_of_sessions):
+                        session_date = payment_date + timedelta(days = random.randint(1,100))
+                        events.append({
+                            "user_id": user_id,
+                        "event": "app_opened",
+                        "timestamp": session_date
+                        })
 
                     #Probabilidad de inversión en función del plan del usuario
                     if plan == "Elite":

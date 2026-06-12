@@ -39,3 +39,5 @@ for i in range(len(funnel_steps)-1):
         f"{current_step} -> {next_step}: "
         f"{conversion:.2f}%"
     )
+
+    print(df_events["event"].value_counts())
