@@ -50,3 +50,14 @@ for occupation in total_by_occupation.index:
     investors_count = investors_by_occupation.get(occupation,0)
     rate = (investors_count/total)*100
     print(f"{occupation}: {rate:.2f}%")
+
+#Calcular la tasa de inversores por plan
+total_by_plan = df_users["plan"].value_counts()
+investors_by_plan = investors["plan"].value_counts()
+
+for plan in total_by_plan.index:
+
+    total_plan = total_by_plan[plan]
+    total_investors = investors_by_plan.get(plan,0)
+    rate = (total_investors/total_plan)*100
+    print(f"{plan}: {rate:.2f}%")

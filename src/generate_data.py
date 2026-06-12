@@ -34,6 +34,13 @@ channels = [
     "YouTube"
 ]
 
+plans = [
+    "Basic",
+    "Plus",
+    "Pro",
+    "Elite"
+]
+
 
 #Funcion para generar un usuario
 
@@ -59,6 +66,7 @@ def generate_user(user_id):
         random.randint(1,12),
         random.randint(1,28)
     )
+    plan = random.choices(plans, weights = [60,25,10,5],k=1)[0]
     return {
         "user_id": user_id,
         "age": age,
@@ -67,12 +75,19 @@ def generate_user(user_id):
         "occupation": occupation, 
         "acquisition_channel": channel,
         "income_level": income_level,
-        "registration_date": registration_date
+        "registration_date": registration_date,
+        "plan": plan
     }
 
 
-def generate_events(user_id, registration_date):
+def generate_events(user):
     #Funcion que va a genear los eventos de un usuario
+    user_id = user["user_id"]
+    registration_date = user["registration_date"]
+    occupation = user["occupation"]
+    income_level = user["income_level"]
+    plan = user["plan"]
+    
     events = []
 
     #Todos los usuarios hacen signup
@@ -89,6 +104,10 @@ def generate_events(user_id, registration_date):
                        "event": "kyc_completed",
                        "timestamp": kyc_date
                        })
+        
+        #En el deposito se va a añadir una cantidad de dinero aletaroria
+        # en funcion de los ingresos de cada usuario
+        deposit_amount = round(income_level*random.uniform(0.05,0.30),2)
     
         #Aprox el 75% va a hacer un deposito luego de completar el kyc
         if random.random() < 0.75:
@@ -97,7 +116,8 @@ def generate_events(user_id, registration_date):
             events.append({
                 "user_id": user_id,
                 "event": "first_deposit",
-                "timestamp": deposit_date
+                "timestamp": deposit_date,
+                "deposit_amount": deposit_amount
             })
         
             #El 85% de esos usuarios acabara pidiendo una tarjeta
@@ -121,8 +141,17 @@ def generate_events(user_id, registration_date):
                         "timestamp": payment_date
                     })
 
+                    #Probabilidad de inversión en función del plan del usuario
+                    if plan == "Elite":
+                        investment_probability = 0.70
+                    elif plan == "Pro":
+                        investment_probability = 0.50
+                    elif plan == "Plus":
+                        investment_probability = 0.35
+                    else:
+                        investment_probability = 0.20
                     #El 35% hará una inversión
-                    if random.random() < 0.35:
+                    if random.random() < investment_probability:
                         #Fecha primera inversión
                         investment_date = payment_date + timedelta(days = random.randint(5,90))
                         events.append({
@@ -144,7 +173,7 @@ for i in range(1,101):
 #Crear eventos
 all_events = []
 for user in users:
-    user_events = generate_events(user["user_id"], user["registration_date"])
+    user_events = generate_events(user)
     all_events.extend(user_events)
 
 #Crear dataframes
