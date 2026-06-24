@@ -50,7 +50,7 @@ def generate_user(user_id):
     country = random.choice(countries)
     device = random.choice(devices)
     occupation = random.choice(occupations)
-    #La edad se decide en función de la ocupación
+    #La edad y cantidad de ingresos se decide en función de la ocupación
     if occupation == "Student":
         age = random.randint(18,24)
         income_level = random.randint(300,1200)
@@ -60,12 +60,15 @@ def generate_user(user_id):
     else:
         age = random.randint(25,65)
         income_level = random.randint(1000,10000)
+    #Canal de adquisición
     channel = random.choice(channels)
+    #Fecha de registro
     registration_date = datetime(
         2025, 
         random.randint(1,12),
         random.randint(1,28)
     )
+    #Los posibles planes tienen diferente peso 
     plan = random.choices(plans, weights = [60,25,10,5],k=1)[0]
     return {
         "user_id": user_id,
@@ -82,12 +85,14 @@ def generate_user(user_id):
 
 def generate_events(user):
     #Funcion que va a genear los eventos de un usuario
+    #Obtner todos los datos del usuario
     user_id = user["user_id"]
     registration_date = user["registration_date"]
     occupation = user["occupation"]
     income_level = user["income_level"]
     plan = user["plan"]
     
+    #Lista para guardar los eventos de un usuario
     events = []
 
     #Todos los usuarios hacen signup
@@ -161,7 +166,7 @@ def generate_events(user):
                         investment_probability = 0.35
                     else:
                         investment_probability = 0.20
-                    #El 35% hará una inversión
+                    #El 35% hará una inversión (incluyendo la probabilidad de que sea inversor)
                     if random.random() < investment_probability:
                         #Fecha primera inversión
                         investment_date = payment_date + timedelta(days = random.randint(5,90))
