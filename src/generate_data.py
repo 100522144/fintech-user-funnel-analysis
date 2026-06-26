@@ -181,8 +181,9 @@ def generate_events(user):
 
 
 #Crear los usuarios
+NUM_USERS = 10000
 users = []
-for i in range(1,101):
+for i in range(1,NUM_USERS+1):
     user = generate_user(i)
     users.append(user)
 
